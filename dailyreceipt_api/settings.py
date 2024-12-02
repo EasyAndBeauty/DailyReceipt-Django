@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "drf_yasg",
     "rest_framework",
+    "users",
     "todos",
     "receipts",
     "authentication",
@@ -76,6 +77,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "users.middleware.FirebaseAuthMiddleware",
 ]
 
 ROOT_URLCONF = "dailyreceipt_api.urls"
