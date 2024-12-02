@@ -3,3 +3,8 @@ __pycache__/
 *.pyc
 db.sqlite3
 .env
+
+# Firebase credentials
+firebase/
+*.json
+firebase/serviceAccountKey.json
