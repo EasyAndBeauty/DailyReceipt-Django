@@ -81,10 +81,12 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     # index
     path("", index),
+    # api
     path(
         "api/",
         include(
             [
+                # auth
                 path("auth/", include("authentication.urls")),
             ]
         ),

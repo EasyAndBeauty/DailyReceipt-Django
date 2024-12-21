@@ -84,6 +84,22 @@ except Exception as e:
 # Firebase settings
 FIREBASE_WEB_API_KEY = os.environ.get("FIREBASE_WEB_API_KEY")
 
+
+# Firebase initialization
+try:
+    if not firebase_admin._apps:
+        FIREBASE_SERVICE_ACCOUNT_PATH = os.path.join(
+            BASE_DIR, os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH")
+        )
+        cred = credentials.Certificate(FIREBASE_SERVICE_ACCOUNT_PATH)
+        firebase_admin.initialize_app(cred)
+        print("Firebase initialized successfully")
+except Exception as e:
+    print(f"Firebase initialization error: {str(e)}")
+
+# Firebase settings
+FIREBASE_WEB_API_KEY = os.environ.get("FIREBASE_WEB_API_KEY")
+
 # Application definition
 
 INSTALLED_APPS = [
