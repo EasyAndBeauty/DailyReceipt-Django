@@ -12,6 +12,8 @@ import requests
     method='get',
     operation_description="""
     Generate a test Firebase token for development purposes.
+
+    This API is for testing the token issuance process in the flutter client.
     
     This endpoint is only available in DEBUG mode and provides:
     - A Firebase custom token
@@ -214,4 +216,71 @@ def validate_token(request):
         return Response(
             {"error": str(e)}, 
             status=status.HTTP_400_BAD_REQUEST
+        )
+
+@swagger_auto_schema(
+    method='post',
+    operation_description="""
+    Verify Firebase ID token from social login and return user info.
+    
+    This endpoint should be called after successful social login (Google/Apple) from the client.
+    The client should send the Firebase ID token received after social authentication.
+    """,
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=['id_token'],
+        properties={
+            'id_token': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="Firebase ID token from social login",
+                example="eyJhbGciOiJSUzI1NiIs..."
+            )
+        }
+    ),
+    responses={
+        200: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'uid': openapi.Schema(type=openapi.TYPE_STRING),
+                'email': openapi.Schema(type=openapi.TYPE_STRING),
+                'name': openapi.Schema(type=openapi.TYPE_STRING),
+                'picture': openapi.Schema(type=openapi.TYPE_STRING),
+                'provider': openapi.Schema(type=openapi.TYPE_STRING),
+            }
+        ),
+        400: "Invalid token",
+        401: "Unauthorized"
+    },
+    tags=['Authentication']
+)
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def social_auth(request):
+    """Handle social authentication verification"""
+    try:
+        id_token = request.data.get('id_token')
+        if not id_token:
+            return Response(
+                {"error": "No token provided"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # Verify the ID token
+        decoded_token = auth.verify_id_token(id_token)
+        
+        # Extract user info from token
+        user_info = {
+            'uid': decoded_token.get('uid'),
+            'email': decoded_token.get('email', ''),
+            'name': decoded_token.get('name', ''),
+            'picture': decoded_token.get('picture', ''),
+            'provider': decoded_token.get('firebase', {}).get('sign_in_provider', '')
+        }
+        
+        return Response(user_info)
+        
+    except Exception as e:
+        return Response(
+            {"error": str(e)}, 
+            status=status.HTTP_401_UNAUTHORIZED
         )
