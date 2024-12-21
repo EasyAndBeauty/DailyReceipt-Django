@@ -23,6 +23,8 @@ load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# 실행 환경 설정
 ENVIRONMENT = os.environ.get("DJANGO_ENV", "development")
 
 # .env 파일 절대 경로 강제 지정
