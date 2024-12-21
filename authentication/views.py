@@ -4,12 +4,83 @@ from rest_framework.response import Response
 from rest_framework import status
 from firebase_admin import auth
 from django.conf import settings
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 import requests
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="""
+    Generate a test Firebase token for development purposes.
+    
+    This endpoint is only available in DEBUG mode and provides:
+    - A Firebase custom token
+    - An ID token exchanged from the custom token
+    - Test user information
+    
+    Use the returned id_token for testing other authenticated endpoints.
+    """,
+    responses={
+        200: openapi.Response(
+            description="Success",
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        description="Success message",
+                        example="Test tokens generated successfully"
+                    ),
+                    'id_token': openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        description="Firebase ID token to use for authentication",
+                        example="eyJhbGciOiJSUzI1NiIs..."
+                    ),
+                    'custom_token': openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        description="Firebase custom token (for reference only)",
+                        example="eyJhbGciOiJSUzI1NiIs..."
+                    ),
+                    'user': openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'uid': openapi.Schema(
+                                type=openapi.TYPE_STRING,
+                                description="Test user ID",
+                                example="test_user_123"
+                            )
+                        }
+                    )
+                }
+            )
+        ),
+        403: openapi.Response(
+            description="Not available in production mode",
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'error': openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        example="Only available in debug mode"
+                    )
+                }
+            )
+        ),
+        500: "Internal server error"
+    },
+    tags=['Authentication']
+)
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def test_token(request):
-    """테스트용 Firebase 토큰을 생성하는 엔드포인트"""
+    """
+    Generate a test Firebase token for development purposes.
+    This endpoint is only available in DEBUG mode and provides:
+    - A Firebase custom token
+    - An ID token exchanged from the custom token
+    - Test user information
+    """
+
     if not settings.DEBUG:
         return Response({"error": "Only available in debug mode"}, status=403)
     
@@ -47,11 +118,81 @@ def test_token(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
     
-
+@swagger_auto_schema(
+    method='post',
+    operation_description="""
+    Validate a Firebase ID token and return decoded information.
+    
+    Steps to test:
+    1. First call /api/auth/test-token/ to get an ID token
+    2. Use that ID token in this endpoint's request body
+    """,
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=['id_token'],
+        properties={
+            'id_token': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="Firebase ID token to validate",
+                example="eyJhbGciOiJSUzI1NiIs..."
+            )
+        }
+    ),
+    responses={
+        200: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'message': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description="Success message",
+                    example="Token is valid"
+                ),
+                'uid': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description="Firebase user ID",
+                    example="test_user_123"
+                ),
+                'decoded_token': openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    description="Full decoded token information",
+                    example={
+                        "iss": "https://securetoken.google.com/project-id",
+                        "aud": "project-id",
+                        "auth_time": 1621459200,
+                        "user_id": "test_user_123",
+                        "sub": "test_user_123",
+                        "iat": 1621459200,
+                        "exp": 1621462800,
+                        "email": "test@example.com"
+                    }
+                )
+            }
+        ),
+        400: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'error': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    example="Invalid token provided"
+                )
+            }
+        )
+    },
+    tags=['Authentication']
+)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def validate_token(request):
-    """ID 토큰의 유효성을 검증하는 엔드포인트"""
+    """
+    Validate a Firebase ID token and return the decoded information.
+    
+    Requires:
+    - id_token: The Firebase ID token to validate
+    
+    Returns:
+    - Decoded token information if valid
+    - Error message if invalid
+    """
     try:
         id_token = request.data.get('id_token')
         if not id_token:
