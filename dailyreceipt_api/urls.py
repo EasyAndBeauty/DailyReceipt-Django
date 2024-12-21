@@ -57,7 +57,7 @@ urlpatterns = [
         "api/",
         include(
             [
-                path("users/", include("users.urls")),
+                path("auth/", include("authentication.urls")),
             ]
         ),
     ),
