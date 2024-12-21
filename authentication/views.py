@@ -13,8 +13,6 @@ import requests
     method="get",
     operation_description="""
     Generate a test Firebase token for development purposes.
-
-    This API is for testing the token issuance process in the flutter client.
     
     This endpoint is only available in DEBUG mode and provides:
     - A Firebase custom token
