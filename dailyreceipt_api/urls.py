@@ -55,6 +55,20 @@ schema_view = get_schema_view(
 )
 
 
+schema_view = get_schema_view(
+    openapi.Info(
+        title="DailyReceipt API",
+        default_version="v1",
+        description="DailyReceipt API documentation",
+        terms_of_service="https://www.yourapp.com/terms/",
+        contact=openapi.Contact(email="dndb3599@gmail.com"),
+        license=openapi.License(name="MIT"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
+
+
 urlpatterns = [
     # swagger
     path(
