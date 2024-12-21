@@ -22,7 +22,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENVIRONMENT = os.environ.get("DJANGO_ENV", "development")
 # .env 파일 절대 경로 강제 지정
-dotenv_path = os.path.join(BASE_DIR, '.env')
+dotenv_path = os.path.join(BASE_DIR, ".env")
 print(f"DEBUG (settings.py): Loading dotenv from {dotenv_path}")
 load_dotenv(dotenv_path=dotenv_path)
 
@@ -40,7 +40,9 @@ DEBUG = False
 # Firebase initialization
 try:
     if not firebase_admin._apps:
-        FIREBASE_SERVICE_ACCOUNT_PATH = os.path.join(BASE_DIR, os.getenv('FIREBASE_SERVICE_ACCOUNT_PATH'))
+        FIREBASE_SERVICE_ACCOUNT_PATH = os.path.join(
+            BASE_DIR, os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH")
+        )
         cred = credentials.Certificate(FIREBASE_SERVICE_ACCOUNT_PATH)
         firebase_admin.initialize_app(cred)
         print("Firebase initialized successfully")
@@ -48,7 +50,7 @@ except Exception as e:
     print(f"Firebase initialization error: {str(e)}")
 
 # Firebase settings
-FIREBASE_WEB_API_KEY = os.environ.get('FIREBASE_WEB_API_KEY')
+FIREBASE_WEB_API_KEY = os.environ.get("FIREBASE_WEB_API_KEY")
 
 # Application definition
 
