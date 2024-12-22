@@ -261,7 +261,6 @@ def social_auth(request):
 
         # Verify the ID token
         decoded_token = auth.verify_id_token(id_token, clock_skew_seconds=10)
-
         # Extract user info from token
         user_info = {
             "uid": decoded_token.get("uid"),
