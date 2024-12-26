@@ -26,10 +26,6 @@ dotenv_path = os.path.join(BASE_DIR, '.env')
 print(f"DEBUG (settings.py): Loading dotenv from {dotenv_path}")
 load_dotenv(dotenv_path=dotenv_path)
 
-
-# 실행 환경 설정
-ENVIRONMENT = os.environ.get("DJANGO_ENV", "development")
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -63,8 +59,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'drf_yasg',
-    'rest_framework',
+    "drf_yasg",
+    "rest_framework",
     "todos",
     "receipts",
     "authentication",
