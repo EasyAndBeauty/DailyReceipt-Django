@@ -1,5 +1,5 @@
 """
-URL configuration for dailyreceipt_api project.
+URL configuration for Daily Receipt API project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -58,7 +58,7 @@ urlpatterns = [
         "api/",
         include(
             [
-                path("auth/", include("authentication.urls")),
+                path("auth/", include("apps.authentication.urls")),
             ]
         ),
     ),
