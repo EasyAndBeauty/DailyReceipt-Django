@@ -1,5 +1,5 @@
 """
-URL configuration for dailyreceipt_api project.
+URL configuration for Daily Receipt API project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -16,20 +16,21 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include
 from django.http import HttpResponse
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
+from django.urls import include, path
 from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
 
 
 def index(request):
     return HttpResponse("Welcome to DailyReceipt API")
 
+
 schema_view = get_schema_view(
     openapi.Info(
         title="DailyReceipt API",
-        default_version='v1',
+        default_version="v1",
         description="DailyReceipt API documentation",
         terms_of_service="https://www.yourapp.com/terms/",
         contact=openapi.Contact(email="dndb3599@gmail.com"),
@@ -41,20 +42,25 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
-    # swagger 
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-
+    # swagger
+    path(
+        "swagger/",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     # admin
     path("admin/", admin.site.urls),
-
     # index
     path("", index),
-
     # api
-    path("api/", include([
-        
-        # auth
-        path("auth/", include("authentication.urls")),
-    ])),
+    path(
+        "api/",
+        include(
+            [
+                # auth
+                path("auth/", include("authentication.urls")),
+            ]
+        ),
+    ),
 ]
