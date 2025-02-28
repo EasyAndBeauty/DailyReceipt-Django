@@ -9,3 +9,4 @@ sqlparse==0.5.1
 firebase-admin==6.6.0
 tzdata==2024.2
 drf-yasg==1.21.7
+pre-commit==4.1.0
