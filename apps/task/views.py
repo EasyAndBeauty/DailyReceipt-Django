@@ -40,6 +40,7 @@ from .models import Task
             ),
         )
     },
+    tags=["Task"],
 )
 @swagger_auto_schema(
     method="post",
@@ -57,6 +58,7 @@ from .models import Task
         201: openapi.Response("생성된 태스크 정보"),
         400: openapi.Response("잘못된 요청 데이터"),
     },
+    tags=["Task"],
 )
 @api_view(["GET", "POST"])
 @csrf_exempt
@@ -118,6 +120,7 @@ def task_list(request):
         ),
         404: openapi.Response("태스크를 찾을 수 없음"),
     },
+    tags=["Task"],
 )
 @swagger_auto_schema(
     method="put",
@@ -135,6 +138,7 @@ def task_list(request):
         400: openapi.Response("잘못된 요청 데이터"),
         404: openapi.Response("태스크를 찾을 수 없음"),
     },
+    tags=["Task"],
 )
 @api_view(
     [
