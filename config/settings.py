@@ -65,7 +65,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "drf_yasg",
     "rest_framework",
-    "apps.todo",
+    "apps.task",
     "apps.receipt",
     "apps.authentication",
 ]
