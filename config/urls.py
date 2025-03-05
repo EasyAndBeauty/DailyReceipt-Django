@@ -59,7 +59,9 @@ urlpatterns = [
         include(
             [
                 # auth
-                path("auth/", include("authentication.urls")),
+                path("auth/", include("apps.authentication.urls")),
+                # tasks
+                path("task/", include("apps.task.urls")),
             ]
         ),
     ),
