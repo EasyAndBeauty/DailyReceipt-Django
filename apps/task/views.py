@@ -4,22 +4,107 @@ import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import api_view
 
 from .models import Task
 
 
-# 목록 조회
-@csrf_exempt
-def task_list(request):
+@swagger_auto_schema(
+    method="GET",
+    operation_summary="태스크 목록 조회",
+    responses={
+        200: openapi.Response(
+            "태스크 목록",
+            schema=openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            "id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                            "description": openapi.Schema(type=openapi.TYPE_STRING),
+                            "assigned_date": openapi.Schema(
+                                type=openapi.TYPE_STRING, format="date"
+                            ),
+                            "duration": openapi.Schema(type=openapi.TYPE_INTEGER),
+                            "created_at": openapi.Schema(
+                                type=openapi.TYPE_STRING, format="date-time"
+                            ),
+                            "updated_at": openapi.Schema(
+                                type=openapi.TYPE_STRING, format="date-time"
+                            ),
+                        },
+                    ),
+                ),
+            ),
+        )
+    },
+)
+@api_view(["GET"])
+def task_list():
+    """모든 태스크 목록 조회"""
     tasks = Task.objects.all()
     data = list(tasks.values())
     return JsonResponse(data, safe=False)
 
 
-# 상세 조회, 수정, 삭제
+@swagger_auto_schema(
+    method="get",
+    operation_description="특정 태스크의 상세 정보를 조회합니다",
+    responses={
+        200: openapi.Response(
+            "태스크 상세 정보",
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                    "description": openapi.Schema(type=openapi.TYPE_STRING),
+                    "assigned_date": openapi.Schema(
+                        type=openapi.TYPE_STRING, format="date"
+                    ),
+                    "duration": openapi.Schema(type=openapi.TYPE_INTEGER),
+                    "created_at": openapi.Schema(
+                        type=openapi.TYPE_STRING, format="date-time"
+                    ),
+                    "updated_at": openapi.Schema(
+                        type=openapi.TYPE_STRING, format="date-time"
+                    ),
+                },
+            ),
+        ),
+        404: openapi.Response("태스크를 찾을 수 없음"),
+    },
+)
+@swagger_auto_schema(
+    method="put",
+    operation_description="태스크 정보를 수정합니다",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "description": openapi.Schema(type=openapi.TYPE_STRING),
+            "assigned_date": openapi.Schema(type=openapi.TYPE_STRING, format="date"),
+            "duration": openapi.Schema(type=openapi.TYPE_INTEGER),
+        },
+    ),
+    responses={
+        200: openapi.Response("수정된 태스크 정보"),
+        400: openapi.Response("잘못된 요청 데이터"),
+        404: openapi.Response("태스크를 찾을 수 없음"),
+    },
+)
+@api_view(
+    [
+        "GET",
+        "PUT",
+    ]
+)
 @csrf_exempt
 def task_detail(request, pk):
+    """상세 조회, 수정, 삭제"""
+
     try:
         task = Task.objects.get(pk=pk)
     except ObjectDoesNotExist:
@@ -59,9 +144,3 @@ def task_detail(request, pk):
     elif request.method == "DELETE":
         task.delete()
         return JsonResponse({}, status=204)
-
-
-@require_http_methods(["GET"])
-def task_count(request):
-    count = Task.objects.count()
-    return JsonResponse({"total": count})
