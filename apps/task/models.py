@@ -11,7 +11,11 @@ class Task(models.Model):
     )
     assigned_date = models.DateField(
         verbose_name="할당된 날짜",
-        help_text="작업이 할당된 날짜",
+        help_text="""
+        유저가 프론트 상에서 어느 날짜 페이지에 해당 항목을 작성했는지 가리키는 인덱스입니다.
+        유저의 실제 해당 항목 작성 시간과 일치하지 않을 수 있습니다.
+        형식은 "YYYY-MM-DD"입니다.
+        """,
         null=True,
         blank=True,
     )
