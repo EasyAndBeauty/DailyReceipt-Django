@@ -31,15 +31,18 @@ class Receipt(models.Model):
     contents = models.JSONField(
         validators=[validate_task_list],
         default=list,
+        null=False,
+        blank=False,
         help_text="영수증을 핀했을 때의 todo 목록",
     )
 
-    pinned = models.BooleanField(default=True, help_text="현재 핀의 상태")
+    pinned = models.BooleanField(default=False, help_text="현재 핀의 상태")
 
     famous_saying = models.CharField(
         max_length=500, help_text="영수증과 함께 만들어진 명언"
     )
 
+    # TODO: 필요한지 재검토
     receipt_name = models.CharField(
         max_length=100, help_text="영수증을 핀했을 당시의 유저 닉네임"
     )
