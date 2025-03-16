@@ -1,7 +1,7 @@
 # views.py
 import json
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg import openapi
@@ -90,13 +90,18 @@ def task_list(request):
             )
         except KeyError:
             return Response({"error": "필수 필드가 누락되었습니다"}, status=400)
-        except Exception as e:
+        except (ValidationError, json.JSONDecodeError) as e:
             return Response({"error": "잘못된 데이터", "detail": str(e)}, status=400)
 
 
 @swagger_auto_schema(
     method="get",
     operation_description="특정 태스크의 상세 정보를 조회합니다",
+    manual_parameters=[
+        openapi.Parameter(
+            "pk", openapi.IN_PATH, description="태스크 ID", type=openapi.TYPE_INTEGER
+        )
+    ],
     responses={
         200: openapi.Response(
             "태스크 상세 정보",
