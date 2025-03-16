@@ -1,4 +1,4 @@
-"""task 앱의 모델을 정의하는 파일입니다."""
+"""Task models.py"""
 
 from django.db import models
 
