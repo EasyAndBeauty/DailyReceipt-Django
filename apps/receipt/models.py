@@ -48,11 +48,7 @@ class Receipt(models.Model):
     )
 
     created_at = models.DateTimeField(
-        auto_now_add=True, help_text="영수증이 만들어진 실제 시간"
-    )
-
-    updated_at = models.DateTimeField(
-        auto_now=True, help_text="영수증이 최근에 수정된 시간"
+        auto_now_add=True, help_text="영수증이 발행된 시간"
     )
 
     class Meta:

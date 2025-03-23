@@ -1,4 +1,5 @@
-# views.py
+"""views.py"""
+
 import json
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
