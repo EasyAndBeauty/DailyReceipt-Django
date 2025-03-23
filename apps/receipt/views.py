@@ -127,7 +127,9 @@ def receipt_create(request):
             ),
         )
     },
+    tags=["Receipt"],
 )
+@api_view(["GET"])
 def pinned_receipt_list(request):
     """핀된 영수증 목록 조회"""
     if request.method == "GET":

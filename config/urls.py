@@ -62,6 +62,8 @@ urlpatterns = [
                 path("auth/", include("apps.authentication.urls")),
                 # tasks
                 path("task/", include("apps.task.urls")),
+                # receipt
+                path("receipt/", include("apps.receipt.urls")),
             ]
         ),
     ),
