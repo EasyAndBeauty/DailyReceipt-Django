@@ -3,7 +3,6 @@
 import json
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -159,7 +158,7 @@ def task_detail(request, pk):
     try:
         task = Task.objects.get(pk=pk)
     except ObjectDoesNotExist:
-        return JsonResponse({"error": "찾을 수 없음"}, status=404)
+        return Response({"error": "찾을 수 없음"}, status=404)
 
     if request.method == "GET":
         data = {
@@ -170,16 +169,16 @@ def task_detail(request, pk):
             "created_at": task.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             "updated_at": task.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
         }
-        return JsonResponse(data)
+        return Response(data)
 
     elif request.method == "PUT":
         try:
-            data = json.loads(request.body)
+            data = request.data
             task.description = data.get("description", task.description)
             task.assigned_date = data.get("assigned_date", task.assigned_date)
             task.duration = data.get("duration", task.duration)
             task.save()
-            return JsonResponse(
+            return Response(
                 {
                     "id": task.id,
                     "description": task.description,
@@ -190,8 +189,8 @@ def task_detail(request, pk):
                 }
             )
         except json.JSONDecodeError:
-            return JsonResponse({"error": "잘못된 데이터"}, status=400)
+            return Response({"error": "잘못된 데이터"}, status=400)
 
     elif request.method == "DELETE":
         task.delete()
-        return JsonResponse({}, status=204)
+        return Response({}, status=204)
