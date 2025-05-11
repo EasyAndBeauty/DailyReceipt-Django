@@ -17,6 +17,8 @@ import firebase_admin
 from dotenv import load_dotenv
 from firebase_admin import credentials
 
+from .swagger_settings import SWAGGER_SETTINGS
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -69,6 +71,18 @@ INSTALLED_APPS = [
     "apps.receipt",
     "apps.authentication",
 ]
+
+# Swagger Settings
+SWAGGER_SETTINGS = SWAGGER_SETTINGS
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "apps.authentication.authentication.FirebaseAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

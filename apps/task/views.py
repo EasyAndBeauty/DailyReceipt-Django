@@ -15,6 +15,7 @@ from .models import Task
 @swagger_auto_schema(
     method="get",
     operation_description="모든 태스크 목록을 조회합니다",
+    security=[{"Bearer": []}],
     responses={
         200: openapi.Response(
             "태스크 목록",
@@ -45,6 +46,7 @@ from .models import Task
 @swagger_auto_schema(
     method="post",
     operation_description="새로운 태스크를 생성합니다",
+    security=[{"Bearer": []}],
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         required=["description"],
