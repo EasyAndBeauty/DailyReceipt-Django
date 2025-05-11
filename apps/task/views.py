@@ -1,8 +1,6 @@
 """views.py"""
 
-import json
-
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -10,6 +8,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Task
+from .serializers import TaskSerializer
 
 
 @swagger_auto_schema(
@@ -68,32 +67,15 @@ def task_list(request):
     """모든 태스크 목록을 조회하거나 새 태스크를 생성합니다."""
     if request.method == "GET":
         tasks = Task.objects.all()
-        data = list(tasks.values())
-        return Response(data)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
 
     elif request.method == "POST":
-        try:
-            data = request.data
-            task = Task.objects.create(
-                description=data["description"],
-                assigned_date=data.get("assigned_date"),
-                duration=data.get("duration", 0),
-            )
-            return Response(
-                {
-                    "id": task.id,
-                    "description": task.description,
-                    "assigned_date": str(task.assigned_date),
-                    "duration": task.duration,
-                    "created_at": str(task.created_at),
-                    "updated_at": str(task.updated_at),
-                },
-                status=201,
-            )
-        except KeyError:
-            return Response({"error": "필수 필드가 누락되었습니다"}, status=400)
-        except (ValidationError, json.JSONDecodeError) as e:
-            return Response({"error": "잘못된 데이터", "detail": str(e)}, status=400)
+        serializer = TaskSerializer(data=request.data)
+        if serializer.is_valid():
+            task = serializer.save()
+            return Response(TaskSerializer(task).data, status=201)
+        return Response(serializer.errors, status=400)
 
 
 @swagger_auto_schema(
@@ -147,12 +129,21 @@ def task_list(request):
     },
     tags=["Task"],
 )
-@api_view(
-    [
-        "GET",
-        "PUT",
-    ]
+@swagger_auto_schema(
+    method="delete",
+    operation_description="태스크를 삭제합니다",
+    manual_parameters=[
+        openapi.Parameter(
+            "pk", openapi.IN_PATH, description="태스크 ID", type=openapi.TYPE_INTEGER
+        )
+    ],
+    responses={
+        204: openapi.Response("태스크가 성공적으로 삭제됨"),
+        404: openapi.Response("태스크를 찾을 수 없음"),
+    },
+    tags=["Task"],
 )
+@api_view(["GET", "PUT", "DELETE"])
 @csrf_exempt
 def task_detail(request, pk):
     """상세 조회, 수정, 삭제"""
@@ -163,36 +154,16 @@ def task_detail(request, pk):
         return Response({"error": "찾을 수 없음"}, status=404)
 
     if request.method == "GET":
-        data = {
-            "id": task.id,
-            "description": task.description,
-            "assigned_date": task.assigned_date.strftime("%Y-%m-%d"),
-            "duration": task.duration,
-            "created_at": task.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            "updated_at": task.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
-        }
-        return Response(data)
+        serializer = TaskSerializer(task)
+        return Response(serializer.data)
 
     elif request.method == "PUT":
-        try:
-            data = request.data
-            task.description = data.get("description", task.description)
-            task.assigned_date = data.get("assigned_date", task.assigned_date)
-            task.duration = data.get("duration", task.duration)
-            task.save()
-            return Response(
-                {
-                    "id": task.id,
-                    "description": task.description,
-                    "assigned_date": task.assigned_date.strftime("%Y-%m-%d"),
-                    "duration": task.duration,
-                    "created_at": task.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-                    "updated_at": task.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
-                }
-            )
-        except json.JSONDecodeError:
-            return Response({"error": "잘못된 데이터"}, status=400)
+        serializer = TaskSerializer(task, data=request.data, partial=True)
+        if serializer.is_valid():
+            task = serializer.save()
+            return Response(TaskSerializer(task).data)
+        return Response(serializer.errors, status=400)
 
     elif request.method == "DELETE":
         task.delete()
-        return Response({}, status=204)
+        return Response(status=204)
