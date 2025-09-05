@@ -1,0 +1,44 @@
+"""Task models.py"""
+
+from django.db import models
+
+
+class Task(models.Model):
+    """Task 모델 클래스"""
+
+    description = models.CharField(
+        max_length=255, verbose_name="작업 설명", help_text="수행할 작업에 대한 설명"
+    )
+    assigned_date = models.DateField(
+        verbose_name="할당된 날짜",
+        help_text="""
+        유저가 프론트 상에서 어느 날짜 페이지에 해당 항목을 작성했는지 가리키는 인덱스입니다.
+        유저의 실제 해당 항목 작성 시간과 일치하지 않을 수 있습니다.
+        형식은 "YYYY-MM-DD"입니다.
+        """,
+        null=True,
+        blank=True,
+    )
+    duration = models.PositiveIntegerField(
+        default=0,
+        verbose_name="소요 시간(분)",
+        help_text="작업 완료에 소요된 시간(분 단위)",
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name="생성 시간", help_text="작업이 생성된 시간"
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="수정 시간",
+        help_text="작업이 마지막으로 수정된 시간",
+    )
+
+    def __str__(self):
+        return f"{self.description} ({self.assigned_date})"
+
+    class Meta:
+        """Task 모델 메타 클래스"""
+
+        ordering = ["-created_at"]
+        verbose_name = "Task"
+        verbose_name_plural = "Tasks"
